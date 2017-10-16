@@ -87,6 +87,28 @@ def getAnalysis(tempoArr, targetTempo, marginOfError):
     # Concatenate a string that describes the list of lists
     description = ""
     # TODO: Concatenate this string
+    # Create first line (special Case)
+    if (behaviorList[0][0] == "slow"):
+        description = "You started out slow, and were slow for " + str(behaviorList[0][1]) + " measures until measure number " + str(behaviorList[0][2]) + ".\n"
+    elif (behaviorList[0][0] == "fast"):
+        description = "You started out fast, and were fast for " + str(behaviorList[0][1]) + " measures until measure number " + str(behaviorList[0][2]) + ".\n"
+    elif (behaviorList[0][0] == "steady"):
+        description = "You started our steady, and were steady for " + str(behaviorList[0][1]) + " measures until measure number " + str(behaviorList[0][2]) + ".\n"
+    # Create the description for the second line throgh the second to last line
+    for index in  range(1, len(behaviorList) - 1):
+        if (behaviorList[index][0] == "slow"):
+            description += "Starting in measure " + str(behaviorList[index - 1][2] + 1) + " you were slow, and were slow for " + str(behaviorList[index][1]) + " measures until measure number " + str(behaviorList[index][2]) + ".\n"
+        elif (behaviorList[index][0] == "fast"):
+            description += "Starting in measure " + str(behaviorList[index - 1][2] + 1) + " you were fast, and were fast for " + str(behaviorList[index][1]) + " measures until measure number " + str(behaviorList[index][2]) + ".\n"
+        elif (behaviorList[index][0] == "steady"):
+            description += "Starting in measure " + str(behaviorList[index - 1][2] + 1) + " you were steady, and were steady for " + str(behaviorList[index][1]) + " measures until measure number " + str(behaviorList[index][2]) + ".\n"
+    # Create the description of the final line
+    if (behaviorList[len(behaviorList) - 1][0] == "slow"):
+        description += "Starting in measure " + str(behaviorList[len(behaviorList) - 2][2] + 1) + " you were slow, and were slow for " + str(behaviorList[len(behaviorList) - 1][1]) + " measures until the end of the piece.\n"
+    elif (behaviorList[len(behaviorList) - 1][0] == "fast"):
+        description += "Starting in measure " + str(behaviorList[len(behaviorList) - 2][2] + 1) + " you were fast, and were fast for " + str(behaviorList[len(behaviorList) - 1][1]) + " measures until the end of the piece.\n"
+    elif (behaviorList[len(behaviorList) - 1][0] == "steady"):
+        description += "Starting in measure " + str(behaviorList[len(behaviorList) - 2][2] + 1) + " you were steady, and were steady for " + str(behaviorList[len(behaviorList) - 1][1]) + " measures until the end of the piece.\n"
     # Return this string
     return description
 
