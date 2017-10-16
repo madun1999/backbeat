@@ -8,8 +8,9 @@
 # marginOfError represents the allowable divergence from the target without a comment.
 # Returns a string describing the patterns of the musician
 def getAnalysis(tempoArr, targetTempo, marginOfError):
-    # TODO define this method as pseudocode
-    # Create a list of lists. Each sublist will contain a string denoting 'fast' 'slow' or 'steady', an integer that denotes the duration of this action, and an integer that denotes the measure number of the last measure of this behavior
+    # Create a list of lists. Each sublist will contain a string denoting 'fast' 'slow' or 'steady', 
+    # an integer that denotes the duration of this action, 
+    # and an integer that denotes the measure number of the last measure of this behavior
     behaviorList = []
     # Loop through the array of tempos
     # Set up the loop
@@ -76,8 +77,16 @@ def getAnalysis(tempoArr, targetTempo, marginOfError):
                 slowDuration = 0
                 fastDuration = 0
                 steadyDuration = 1
+    # Add final entry to behaviorList
+    if (slowDuration > 1):
+        behaviorList.append(["slow", slowDuration, len(tempoArr)])
+    elif (fastDuration > 1):
+        behaviorList.append(["fast", fastDuration, len(tempoArr)])
+    elif (steadyDuration > 1):
+        behaviorList.append(["steady", steadyDuration, len(tempoArr)])
     # Concatenate a string that describes the list of lists
     description = ""
+    # TODO: Concatenate this string
     # Return this string
     return description
 
