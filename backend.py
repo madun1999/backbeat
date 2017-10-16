@@ -86,7 +86,6 @@ def getAnalysis(tempoArr, targetTempo, marginOfError):
         behaviorList.append(["steady", steadyDuration, len(tempoArr)])
     # Concatenate a string that describes the list of lists
     description = ""
-    # TODO: Concatenate this string
     # Create first line (special Case)
     if (behaviorList[0][0] == "slow"):
         description = "You started out slow, and were slow for " + str(behaviorList[0][1]) + " measures until measure number " + str(behaviorList[0][2]) + ".\n"
