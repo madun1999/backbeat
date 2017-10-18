@@ -1,5 +1,5 @@
 # This file contains the backend methods that will process the output of Essentia and provide understandable feedback based on this.
-
+import numpy as np
 # Method to determine where the player slowed/sped up and return a string describing this
 # Accepts an array of integers each representing the tempo in a given measure and an integer representing the target tempo
 # Also accepts an integer representing the allowable margin of error
@@ -42,12 +42,12 @@ def getAnalysis(tempoArr, targetTempo, marginOfError):
                 slowDuration = 1
             else:
                 # This measure is steady
-                steadyDuration++
+                steadyDuration += 1
         elif (fastDuration > 0):
             # The last measure(s) was fast
             if (tempoArr[measure] > (targetTempo + marginOfError)):
                 # This measure is fast
-                fastDuration++
+                fastDuration += 1
             elif (tempoArr[measure] < (targetTempo - marginOfError)):
                 # This measure is slow
                 behaviorList.append(["fast", fastDuration, measure])
@@ -70,7 +70,7 @@ def getAnalysis(tempoArr, targetTempo, marginOfError):
                 fastDuration = 1
             elif (tempoArr[measure] < (targetTemp - marginOfError)):
                 # This measure is slow
-                slowDuration++
+                slowDuration += 1
             else:
                 # This measure is steady
                 behaviorList.append(["slow", slowDuration, measure])
@@ -87,27 +87,30 @@ def getAnalysis(tempoArr, targetTempo, marginOfError):
     # Concatenate a string that describes the list of lists
     description = ""
     # Create first line (special Case)
+    avgTempo = np.average(tempoArr[0:(behaviorList[0][2])])
     if (behaviorList[0][0] == "slow"):
-        description = "You started out slow, and were slow for " + str(behaviorList[0][1]) + " measures until measure number " + str(behaviorList[0][2]) + ".\n"
+        description = "You started out slow, and were slow for " + str(behaviorList[0][1]) + " measures until measure number " + str(behaviorList[0][2]) + " with an average tempo of " + avgTempo + " BPM.\n"
     elif (behaviorList[0][0] == "fast"):
-        description = "You started out fast, and were fast for " + str(behaviorList[0][1]) + " measures until measure number " + str(behaviorList[0][2]) + ".\n"
+        description = "You started out fast, and were fast for " + str(behaviorList[0][1]) + " measures until measure number " + str(behaviorList[0][2]) + " with an average tempo of " + avgTempo + " BPM.\n"
     elif (behaviorList[0][0] == "steady"):
-        description = "You started our steady, and were steady for " + str(behaviorList[0][1]) + " measures until measure number " + str(behaviorList[0][2]) + ".\n"
+        description = "You started our steady, and were steady for " + str(behaviorList[0][1]) + " measures until measure number " + str(behaviorList[0][2]) + " with an average tempo of " + avgTempo + " BPM.\n"
     # Create the description for the second line throgh the second to last line
     for index in  range(1, len(behaviorList) - 1):
+        avgTempo = np.average(tempoArr[behaviorList[index - 1][2]:behaviorList[index][2]])
         if (behaviorList[index][0] == "slow"):
-            description += "Starting in measure " + str(behaviorList[index - 1][2] + 1) + " you were slow, and were slow for " + str(behaviorList[index][1]) + " measures until measure number " + str(behaviorList[index][2]) + ".\n"
+            description += "Starting in measure " + str(behaviorList[index - 1][2] + 1) + " you were slow, and were slow for " + str(behaviorList[index][1]) + " measures until measure number " + str(behaviorList[index][2]) + " with an average tempo of " + avgTempo + " BPM.\n"
         elif (behaviorList[index][0] == "fast"):
-            description += "Starting in measure " + str(behaviorList[index - 1][2] + 1) + " you were fast, and were fast for " + str(behaviorList[index][1]) + " measures until measure number " + str(behaviorList[index][2]) + ".\n"
+            description += "Starting in measure " + str(behaviorList[index - 1][2] + 1) + " you were fast, and were fast for " + str(behaviorList[index][1]) + " measures until measure number " + str(behaviorList[index][2]) + " with an average tempo of " + avgTempo + " BPM.\n"
         elif (behaviorList[index][0] == "steady"):
-            description += "Starting in measure " + str(behaviorList[index - 1][2] + 1) + " you were steady, and were steady for " + str(behaviorList[index][1]) + " measures until measure number " + str(behaviorList[index][2]) + ".\n"
+            description += "Starting in measure " + str(behaviorList[index - 1][2] + 1) + " you were steady, and were steady for " + str(behaviorList[index][1]) + " measures until measure number " + str(behaviorList[index][2]) + " with an average tempo of " + avgTempo + " BPM.\n"
     # Create the description of the final line
+    avgTempo = np.average(tempoArr[behaviorList[index - 1][2]:behaviorList[index][2]])
     if (behaviorList[len(behaviorList) - 1][0] == "slow"):
-        description += "Starting in measure " + str(behaviorList[len(behaviorList) - 2][2] + 1) + " you were slow, and were slow for " + str(behaviorList[len(behaviorList) - 1][1]) + " measures until the end of the piece.\n"
+        description += "Starting in measure " + str(behaviorList[len(behaviorList) - 2][2] + 1) + " you were slow, and were slow for " + str(behaviorList[len(behaviorList) - 1][1]) + " measures until the end of the piece with an average tempo of " + avgTempo + " BPM.\n"
     elif (behaviorList[len(behaviorList) - 1][0] == "fast"):
-        description += "Starting in measure " + str(behaviorList[len(behaviorList) - 2][2] + 1) + " you were fast, and were fast for " + str(behaviorList[len(behaviorList) - 1][1]) + " measures until the end of the piece.\n"
+        description += "Starting in measure " + str(behaviorList[len(behaviorList) - 2][2] + 1) + " you were fast, and were fast for " + str(behaviorList[len(behaviorList) - 1][1]) + " measures until the end of the piece with an average tempo of " + avgTempo + " BPM.\n"
     elif (behaviorList[len(behaviorList) - 1][0] == "steady"):
-        description += "Starting in measure " + str(behaviorList[len(behaviorList) - 2][2] + 1) + " you were steady, and were steady for " + str(behaviorList[len(behaviorList) - 1][1]) + " measures until the end of the piece.\n"
+        description += "Starting in measure " + str(behaviorList[len(behaviorList) - 2][2] + 1) + " you were steady, and were steady for " + str(behaviorList[len(behaviorList) - 1][1]) + " measures until the end of the piece with an average tempo of " + avgTempo + " BPM.\n"
     # Return this string
     return description
 
@@ -119,3 +122,4 @@ def getAnalysis(tempoArr, targetTempo, marginOfError):
 # Returns an array of integers that represents the tempo of each measure.
 def getTempos(audioFile, beatsPerMeasure, tempoEstimate):
     # TODO define this method as pseudocode
+    pass
