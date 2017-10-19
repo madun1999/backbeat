@@ -7,6 +7,7 @@ import numpy as np
 # targetTempo is the tempo the player was aiming to play at
 # marginOfError represents the allowable divergence from the target without a comment
 # Returns a string describing the patterns of the musician
+
 def getAnalysis(tempoArr, targetTempo, marginOfError):
     # Create a list of lists. Each sublist will contain a string denoting 'fast' 'slow' or 'steady', 
     # an integer that denotes the duration of this action, 
@@ -115,11 +116,133 @@ def getAnalysis(tempoArr, targetTempo, marginOfError):
     return description
 
 
+class Ranges(object):
+    cups = 0  # class variable. This belongs to the class
+
+    # __init__ is (basically) a constructor.
+    def __init__(self, speed, start, end):
+        self.speed = speed  # These are instance variables. these belong to the object
+        self.start = start
+        self.end = end
+
+        # Instance method
+
+    def get_range (self):
+        return self.start, self.end
+
+
+    @classmethod  # use decorator @staticmethod to create static methods
+    def get_speed(self):
+        return self.speed
+
+def speedRange(tempoArr, targetTempo, marginOfError, sigSpeedRange):
+    # Create a list of lists. Each sublist will contain a string denoting 'fast' 'slow' or 'steady',
+    # an integer that denotes the duration of this action,
+    # and an integer that denotes the measure number of the last measure of this behavior
+    rangeList = []
+    # Loop through the array of tempos
+    # Set up the loop
+    steadyDuration = 0
+    fastDuration = 0
+    slowDuration = 0
+    fastStart = 0
+    slowStart = 0
+    numOfFast = 0
+    numOfSlow = 0
+    counter = 0
+    if (tempoArr[0] > (targetTempo + marginOfError)):
+        fastDuration = 1
+    elif (tempoArr[0] < (targetTempo - marginOfError)):
+        slowDuration = 1
+    else:
+        steadyDuration = 1
+    # Start the loop
+    for measure in range(1, len(tempoArr)):
+        # Fill the list with patches of slowness, fastness, and normalness
+        if (steadyDuration > 0):
+            # The last measure(s) was steady
+            if (tempoArr[measure] > (targetTempo + marginOfError)):
+                # This measure is fast
+                steadyDuration = 0
+                slowDuration = 0
+                fastDuration = 1
+                fastStart = measure
+                numOfFast += 1
+
+            elif (tempoArr[measure] < (targetTempo - marginOfError)):
+                # This measure is slow
+                steadyDuration = 0
+                fastDuration = 0
+                slowDuration = 1
+                slowStart = measure
+                numOfSlow += 1
+            else:
+                # This measure is steady
+                steadyDuration += 1
+                fastStart = 0
+                slowStart = 0
+                numOfSlow = 0
+                numOfFast = 0
+        elif (fastDuration > 0):
+            # The last measure(s) was fast
+            if (tempoArr[measure] > (targetTempo + marginOfError)):
+                # This measure is fast
+                fastDuration += 1
+                numOfFast += 1
+            elif (tempoArr[measure] < (targetTempo - marginOfError)):
+                # This measure is slow
+                steadyDuration = 0
+                fastDuration = 0
+                slowDuration = 1
+                if sigSpeedRange <= numOfFast:
+                    rangeList[counter] = Ranges("Fast",fastStart, measure - 1)
+                    counter += 1
+                numOfFast = 0
+                fastStart = 0
+                slowStart = measure
+            else:
+                # This measure is steady
+                if sigSpeedRange <= numOfFast:
+                    rangeList[counter] = Ranges("Fast",fastStart, measure - 1)
+                    counter +=1
+                numOfFast = 0
+                fastStart = 0
+                fastDuration = 0
+                slowDuration = 0
+                steadyDuration = 1
+        elif (slowDuration > 0):
+            # The last measure(s) was slow
+            if (tempoArr[measure] > (targetTempo + marginOfError)):
+                # This measure is fast
+                steadyDuration = 0
+                slowDuration = 0
+                fastDuration = 1
+                if sigSpeedRange <= numOfFast:
+                    rangeList[counter] = Ranges("Fast",fastStart, measure - 1)
+                    counter +=1
+
+            elif (tempoArr[measure] < (targetTemp - marginOfError)):
+                # This measure is slow
+                slowDuration += 1
+                numOfSlow += 1
+
+            else:
+                # This measure is steady
+                slowDuration = 0
+                fastDuration = 0
+                steadyDuration = 1
+                fastStart = 0
+                slowStart = 0
+                numOfSlow = 0
+                numOfFast = 0
+    return rangeList
+
 # method to return an array of integers which each represent the tempo in a single measure of the piece.
 # audioFile is the mp3/wav file to be analyzed
 # beatsPerMeasure is the number of beats in a measure
 # tempoEstimate is the tempo the player is aiming to play at.
 # Returns an array of integers that represents the tempo of each measure.
+import bpmHistogram
 def getTempos(audioFile, beatsPerMeasure, tempoEstimate):
     # TODO define this method as pseudocode
     pass
