@@ -15,6 +15,8 @@ Analyze tempo of piece of music and give feedback on whether the tempo was too f
 5. Edit the code
 6. Commit your code with `git commit`  
    If you want to add a new file to the repo, do `git add <filename>` before you commit
+7. Push your code to the cloud with `git push`  
+   This will push to the branch you are at rather than master
    
 ## Essentia
 Download from https://github.com/MTG/essentia/releases  
