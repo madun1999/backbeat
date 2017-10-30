@@ -6,6 +6,7 @@ import os, wave, math, collections
 metatuple = collections.namedtuple('metatuple', ['nchannels', 'sampwidth', 'framerate', 'nframes', 'comptype', 'compname'])
 datatuple = collections.namedtuple('datatuple', ['meta', 'data'])
 
+# opens a wav file and returns the data as a tuple
 def readwave(src):
     read = wave.open(src, 'rb')
     meta = read.getparams()
