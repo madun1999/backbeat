@@ -4,7 +4,7 @@ import analyze_beats
 import splitterkit
 import os
 
-def getMeasures(file_path, beat_arr, confidence_threshold):
+def getMeasures(file_path, beat_arr, beats_per_measure, confidence_threshold):
     data = splitterkit.readwave(file_path)
     splitted = splitterkit.slicewave_s(data, 2, 3)
     print(splitted[0])
@@ -12,6 +12,21 @@ def getMeasures(file_path, beat_arr, confidence_threshold):
     dir_path = os.path.dirname(os.path.realpath(__file__))
     print(dir_path)
     print(splitterkit.writewave(dir_path + '/wav_collection/split_wav_file-', splitted))
+    # START OF PSEUDOCODE
+    # Remove all values from beat_arr that do not represent the division of a measure
+    # index = 0
+    # initialize the list of lists, where each index represents a chunk of measures, the first piece of data is the wav file path, and the second piece is the number of measures that wav file contains
+    # while index is less than bear_arr length
+    #   snippet length = 1
+    #   get the snippet
+    #   get BPM of snippet
+    #   while snippet does not return a BPM with the given confidence threshold
+    #       add 1 to snippet length
+    #       get new snippet
+    #       update the snippet bpm
+    #   add the snippet to the list
+    # return the list
+
 
 getMeasures('sample_wav_files/air_force_song.wav', [], 0)
 
