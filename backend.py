@@ -1,5 +1,21 @@
 # This file contains the backend methods that will process the output of Essentia and provide understandable feedback based on this.
 import numpy as np
+import analyze_beats
+import splitterkit
+import os
+
+def getMeasures(file_path, beat_arr, confidence_threshold):
+    data = splitterkit.readwave(file_path)
+    splitted = splitterkit.slicewave_s(data, 2, 3)
+    print(splitted[0])
+    open('wav_collection/split_wav_file.wav', 'w')
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    print(dir_path)
+    print(splitterkit.writewave(dir_path + '/wav_collection/split_wav_file-', splitted))
+
+getMeasures('sample_wav_files/air_force_song.wav', [], 0)
+
+
 # Method to determine where the player slowed/sped up and return a string describing this
 # Accepts an array of integers each representing the tempo in a given measure and an integer representing the target tempo
 # Also accepts an integer representing the allowable margin of error
@@ -9,8 +25,8 @@ import numpy as np
 # Returns a string describing the patterns of the musician
 
 def getAnalysis(tempoArr, targetTempo, marginOfError):
-    # Create a list of lists. Each sublist will contain a string denoting 'fast' 'slow' or 'steady', 
-    # an integer that denotes the duration of this action, 
+    # Create a list of lists. Each sublist will contain a string denoting 'fast' 'slow' or 'steady',
+    # an integer that denotes the duration of this action,
     # and an integer that denotes the measure number of the last measure of this behavior
     behaviorList = []
     # Loop through the array of tempos
