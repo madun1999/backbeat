@@ -100,7 +100,7 @@ def getAnalysis(tempoArr, targetTempo, marginOfError):
                 steadyDuration = 0
                 slowDuration = 0
                 fastDuration = 1
-            elif (tempoArr[measure] < (targetTemp - marginOfError)):
+            elif (tempoArr[measure] < (targetTempo - marginOfError)):
                 # This measure is slow
                 slowDuration += 1
             else:
@@ -252,7 +252,7 @@ def speedRange(tempoArr, targetTempo, marginOfError, sigSpeedRange):
                     rangeList[counter] = Ranges("Fast",fastStart, measure - 1)
                     counter +=1
 
-            elif (tempoArr[measure] < (targetTemp - marginOfError)):
+            elif (tempoArr[measure] < (targetTempo - marginOfError)):
                 # This measure is slow
                 slowDuration += 1
                 numOfSlow += 1
@@ -273,7 +273,7 @@ def speedRange(tempoArr, targetTempo, marginOfError, sigSpeedRange):
 # beatsPerMeasure is the number of beats in a measure
 # tempoEstimate is the tempo the player is aiming to play at.
 # Returns an array of integers that represents the tempo of each measure.
-import bpmHistogram
+#import bpmHistogram
 def getTempos(audioFile, beatsPerMeasure, tempoEstimate):
     # TODO define this method as pseudocode
     pass
