@@ -4,7 +4,8 @@ import analyze_beats
 import splitterkit
 import os
 
-def getMeasures(file_path, beat_arr, beats_per_measure, confidence_threshold):
+def getMeasures(file_path, beats_per_measure, confidence_threshold):
+    beat_arr = analyze_beats.get_beat_locations_from_wav_file(file_path)
     data = splitterkit.readwave(file_path)
     splitted = splitterkit.slicewave_s(data, 2, 3)
     print(splitted[0])
@@ -15,7 +16,9 @@ def getMeasures(file_path, beat_arr, beats_per_measure, confidence_threshold):
     # START OF PSEUDOCODE
     # Remove all values from beat_arr that do not represent the division of a measure
     # index = 0
-    # initialize the list of lists, where each index represents a chunk of measures, the first piece of data is the wav file path, and the second piece is the number of measures that wav file contains
+    # initialize the list of lists, where each index represents a chunk of measures,
+    # the first piece of data is the wav file path, and the second piece is
+    # the number of measures that wav file contains
     # while index is less than bear_arr length
     #   snippet length = 1
     #   get the snippet
@@ -26,6 +29,40 @@ def getMeasures(file_path, beat_arr, beats_per_measure, confidence_threshold):
     #       update the snippet bpm
     #   add the snippet to the list
     # return the list
+    #
+    # START OF IMPLEMENTATION
+    measure_arr = []
+    measure_arr[0] = 0
+    num_measures = 0
+    for i in range(0, len(beat_arr)):
+        if ((i + 1) % beats_per_measure == 0):
+            num_measures += 1
+            measure_arr[num_measures] = beat_arr[i]
+    # NOTE at this point there is a chunk of music after the last location in measure_arr that
+    # we also need to analyze but that is not a full measure
+    index = 0
+    chunk_arr = []
+    num_chunks = 0
+    while (index < (len(beat_arr) - 1)):
+        chunk_length = 1
+        chunk_data = splitterkit.slicewave_s(data, measure_arr[index], measure_arr[index + chunk_length])
+        chunk_path = splitterkit.writewave(dir_path + '/wav_collection/split_wav_file-', chunk_data)
+        if (index + chunk_length == len(beat_arr) - 1):
+            # This goes to the end of our data. Use this regardless of what the BPM returns
+            chunk_arr[num_chunks] = [chunk_path, chunk_length]
+            num_chunks += 1
+            break
+        chunk_BPM = analyze_beats.get_bpm_from_wav_file(chunk_path, confidence_threshold)
+        while (chunk_BPM == 0 and index + chunk_length < (len(beat_arr) - 1)):
+            chunk_length += 1
+            chunk_data = splitterkit.slicewave_s(data, measure_arr[index], measure_arr[index + chunk_length])
+            chunk_path = splitterkit.writewave(dir_path + '/wav_collection/split_wav_file-', chunk_data)
+            chunk_BPM = analyze_beats.get_bpm_from_wav_file(chunk_path, confidence_threshold)
+        # Either the chunk returns a BPM or it goes until the end of our data
+        chunk_arr[num_chunks] = [chunk_path, chunk_length]
+        num_chunks += 1
+        index = index + chunk_length
+    return chunk_arr
 
 
 getMeasures('sample_wav_files/air_force_song.wav', [], 0)
