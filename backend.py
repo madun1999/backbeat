@@ -38,17 +38,17 @@ def getMeasures(file_path, beats_per_measure, confidence_threshold):
     index = 0
     chunk_arr = []
     num_chunks = 0
-    while (index < (len(beat_arr) - 1)):
+    while (index < (len(measure_arr) - 1)):
         chunk_length = 1
         chunk_data = splitterkit.slicewave_s(data, measure_arr[index], measure_arr[index + chunk_length])
         chunk_path = splitterkit.writewave(dir_path + '/wav_collection/split_wav_file-', chunk_data)
-        if (index + chunk_length == len(beat_arr) - 1):
+        if (index + chunk_length == len(measure_arr) - 1):
             # This goes to the end of our data. Use this regardless of what the BPM returns
             chunk_arr.append([chunk_path, chunk_length])
             num_chunks += 1
             break
         chunk_BPM = analyze_beats.get_bpm_from_wav_file(chunk_path, confidence_threshold)
-        while (chunk_BPM == 0 and index + chunk_length < (len(beat_arr) - 1)):
+        while (chunk_BPM == 0 and index + chunk_length < (len(measure_arr) - 1)):
             chunk_length += 1
             chunk_data = splitterkit.slicewave_s(data, measure_arr[index], measure_arr[index + chunk_length])
             chunk_path = splitterkit.writewave(dir_path + '/wav_collection/split_wav_file-', chunk_data)
