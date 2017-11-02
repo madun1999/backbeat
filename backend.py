@@ -1,31 +1,13 @@
 # This file contains the backend methods that will process the output of Essentia and provide understandable feedback based on this.
 import numpy as np
 import analyze_beats
-import splitterkit
 import os
 
+# will return an array of arrays where each index is a chunk of measures and the the first value at that index is the
+# BPM of a chunk and the second value is the duration of that chunk im measures. EX:
+# [[BPM1, NumMeasure1], [BPM2, NumMeasures2]]
 def getMeasures(file_path, beats_per_measure, confidence_threshold):
-    # START OF PSEUDOCODE
-    # Remove all values from beat_arr that do not represent the division of a measure
-    # index = 0
-    # initialize the list of lists, where each index represents a chunk of measures,
-    # the first piece of data is the wav file path, and the second piece is
-    # the number of measures that wav file contains
-    # while index is less than bear_arr length
-    #   snippet length = 1
-    #   get the snippet
-    #   get BPM of snippet
-    #   while snippet does not return a BPM with the given confidence threshold
-    #       add 1 to snippet length
-    #       get new snippet
-    #       update the snippet bpm
-    #   add the snippet to the list
-    # return the list
-    #
-    # START OF IMPLEMENTATION
     beat_arr = analyze_beats.get_beat_locations_from_wav_file(file_path)
-    data = splitterkit.readwave(file_path)
-    dir_path = os.path.dirname(os.path.realpath(__file__))
     measure_arr = []
     measure_arr.append(0)
     num_measures = 0
@@ -40,21 +22,17 @@ def getMeasures(file_path, beats_per_measure, confidence_threshold):
     num_chunks = 0
     while (index < (len(measure_arr) - 1)):
         chunk_length = 1
-        chunk_data = splitterkit.slicewave_s(data, measure_arr[index], measure_arr[index + chunk_length])
-        chunk_path = splitterkit.writewave(dir_path + '/wav_collection/split_wav_file-', chunk_data)
+        chunk_BPM = analyze_beats.get_bpm_from_wav_file(file_path, measure_arr[index], measure_arr[index + chunk_length], confidence_threshold)
         if (index + chunk_length == len(measure_arr) - 1):
             # This goes to the end of our data. Use this regardless of what the BPM returns
-            chunk_arr.append([chunk_path, chunk_length])
+            chunk_arr.append([chunk_BPM, chunk_length])
             num_chunks += 1
             break
-        chunk_BPM = analyze_beats.get_bpm_from_wav_file(chunk_path, confidence_threshold)
         while (chunk_BPM == 0 and index + chunk_length < (len(measure_arr) - 1)):
             chunk_length += 1
-            chunk_data = splitterkit.slicewave_s(data, measure_arr[index], measure_arr[index + chunk_length])
-            chunk_path = splitterkit.writewave(dir_path + '/wav_collection/split_wav_file-', chunk_data)
-            chunk_BPM = analyze_beats.get_bpm_from_wav_file(chunk_path, confidence_threshold)
+            chunk_BPM = analyze_beats.get_bpm_from_wav_file(file_path, measure_arr[index], measure_arr[index + chunk_length], confidence_threshold)
         # Either the chunk returns a BPM or it goes until the end of our data
-        chunk_arr.append([chunk_path, chunk_length])
+        chunk_arr.append([chunk_BPM, chunk_length])
         num_chunks += 1
         index = index + chunk_length
     return chunk_arr
