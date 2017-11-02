@@ -4,7 +4,9 @@ import analyze_beats
 import os
 
 # will return an array of arrays where each index is a chunk of measures and the the first value at that index is the
-# BPM of a chunk and the second value is the duration of that chunk im measures. EX:
+# BPM of a chunk and the second value is the duration of that chunk im measures.
+# Note: This may or may not include the final measure of the piece. It will most likely NOT include the final measure.
+# EX:
 # [[BPM1, NumMeasure1], [BPM2, NumMeasures2]]
 def getMeasures(file_path, beats_per_measure, confidence_threshold):
     beat_arr = analyze_beats.get_beat_locations_from_wav_file(file_path)
@@ -22,16 +24,19 @@ def getMeasures(file_path, beats_per_measure, confidence_threshold):
     num_chunks = 0
     while (index < (len(measure_arr) - 1)):
         chunk_length = 1
-        chunk_BPM = analyze_beats.get_bpm_from_wav_file(file_path, measure_arr[index], measure_arr[index + chunk_length], confidence_threshold)
+        chunk_BPM = analyze_beats.get_bpm_from_wav_file(file_path, confidence_threshold, measure_arr[index], measure_arr[index + chunk_length])
         if (index + chunk_length == len(measure_arr) - 1):
             # This goes to the end of our data. Use this regardless of what the BPM returns
+            chunk_BPM = analyze_beats.get_bpm_from_wav_file(file_path, 0, measure_arr[index], measure_arr[index + chunk_length])
             chunk_arr.append([chunk_BPM, chunk_length])
             num_chunks += 1
             break
         while (chunk_BPM == 0 and index + chunk_length < (len(measure_arr) - 1)):
             chunk_length += 1
-            chunk_BPM = analyze_beats.get_bpm_from_wav_file(file_path, measure_arr[index], measure_arr[index + chunk_length], confidence_threshold)
+            chunk_BPM = analyze_beats.get_bpm_from_wav_file(file_path, confidence_threshold, measure_arr[index], measure_arr[index + chunk_length])
         # Either the chunk returns a BPM or it goes until the end of our data
+        if (chunk_BPM == 0):
+            chunk_BPM = analyze_beats.get_bpm_from_wav_file(file_path, 0, measure_arr[index], measure_arr[index + chunk_length])
         chunk_arr.append([chunk_BPM, chunk_length])
         num_chunks += 1
         index = index + chunk_length
