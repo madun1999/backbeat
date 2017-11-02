@@ -32,12 +32,12 @@ def getMeasures(file_path, beats_per_measure, confidence_threshold):
     #
     # START OF IMPLEMENTATION
     measure_arr = []
-    measure_arr[0] = 0
+    measure_arr.append(0)
     num_measures = 0
     for i in range(0, len(beat_arr)):
         if ((i + 1) % beats_per_measure == 0):
             num_measures += 1
-            measure_arr[num_measures] = beat_arr[i]
+            measure_arr.append(beat_arr[i])
     # NOTE at this point there is a chunk of music after the last location in measure_arr that
     # we also need to analyze but that is not a full measure
     index = 0
@@ -49,7 +49,7 @@ def getMeasures(file_path, beats_per_measure, confidence_threshold):
         chunk_path = splitterkit.writewave(dir_path + '/wav_collection/split_wav_file-', chunk_data)
         if (index + chunk_length == len(beat_arr) - 1):
             # This goes to the end of our data. Use this regardless of what the BPM returns
-            chunk_arr[num_chunks] = [chunk_path, chunk_length]
+            chunk_arr.append([chunk_path, chunk_length])
             num_chunks += 1
             break
         chunk_BPM = analyze_beats.get_bpm_from_wav_file(chunk_path, confidence_threshold)
@@ -59,7 +59,7 @@ def getMeasures(file_path, beats_per_measure, confidence_threshold):
             chunk_path = splitterkit.writewave(dir_path + '/wav_collection/split_wav_file-', chunk_data)
             chunk_BPM = analyze_beats.get_bpm_from_wav_file(chunk_path, confidence_threshold)
         # Either the chunk returns a BPM or it goes until the end of our data
-        chunk_arr[num_chunks] = [chunk_path, chunk_length]
+        chunk_arr.append([chunk_path, chunk_length])
         num_chunks += 1
         index = index + chunk_length
     return chunk_arr
