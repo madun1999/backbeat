@@ -5,14 +5,6 @@ import splitterkit
 import os
 
 def getMeasures(file_path, beats_per_measure, confidence_threshold):
-    beat_arr = analyze_beats.get_beat_locations_from_wav_file(file_path)
-    data = splitterkit.readwave(file_path)
-    splitted = splitterkit.slicewave_s(data, 2, 3)
-    print(splitted[0])
-    open('wav_collection/split_wav_file.wav', 'w')
-    dir_path = os.path.dirname(os.path.realpath(__file__))
-    print(dir_path)
-    print(splitterkit.writewave(dir_path + '/wav_collection/split_wav_file-', splitted))
     # START OF PSEUDOCODE
     # Remove all values from beat_arr that do not represent the division of a measure
     # index = 0
@@ -31,6 +23,9 @@ def getMeasures(file_path, beats_per_measure, confidence_threshold):
     # return the list
     #
     # START OF IMPLEMENTATION
+    beat_arr = analyze_beats.get_beat_locations_from_wav_file(file_path)
+    data = splitterkit.readwave(file_path)
+    dir_path = os.path.dirname(os.path.realpath(__file__))
     measure_arr = []
     measure_arr.append(0)
     num_measures = 0
@@ -63,9 +58,6 @@ def getMeasures(file_path, beats_per_measure, confidence_threshold):
         num_chunks += 1
         index = index + chunk_length
     return chunk_arr
-
-
-getMeasures('sample_wav_files/air_force_song.wav', [], 0)
 
 
 # Method to determine where the player slowed/sped up and return a string describing this
