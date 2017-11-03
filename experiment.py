@@ -3,7 +3,7 @@ import essentia.standard
 import essentia.streaming
 
 #instantiate the audio loader; this file is in the current directory
-loader = essentia.standard.MonoLoader(filename='air_force_song.wav')
+loader = essentia.standard.MonoLoader(filename='sample_wav_files/air_force_song.wav')
 
 #actually perform the loading
 audio = loader()
