@@ -63,5 +63,28 @@ def get_length_of_wav_file_seconds(file_path):
         return duration
 
 
+def get_bpm_for_constant_fractions_of_wav_file(file_path, confidence_threshold, num_divisions):
+    #Make sure confidence_threshold is valid
+    if confidence_threshold < 0.0 or confidence_threshold > 1.0:
+        raise ValueError('Confidence threshold must be between 0.0 and 1.0 inclusive')
+
+    if num_divisions <= 0:
+        raise ValueError('num_divisions must be greater than 0')
+
+    length_sec = get_length_of_wav_file_seconds(file_path)
+    print(length_sec)
+
+    bpm_list = []
+
+    for i in range(0, num_divisions):
+        start_audio = length_sec * (i / float(num_divisions))
+        print("Start audio: " + str(start_audio))
+        end_audio = length_sec * ((i + 1) / float(num_divisions))
+        print("End audio: " + str(end_audio))
+        current_bpm = get_bpm_from_wav_file(file_path, confidence_threshold, start_audio, end_audio)
+        bpm_list.append(current_bpm)
+
+    return bpm_list
+
 
 
