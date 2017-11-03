@@ -1,5 +1,48 @@
 # This file contains the backend methods that will process the output of Essentia and provide understandable feedback based on this.
 import numpy as np
+import analyze_beats
+import os
+
+# will return an array of arrays where each index is a chunk of measures and the the first value at that index is the
+# BPM of a chunk and the second value is the duration of that chunk im measures.
+# Note: This may or may not include the final measure of the piece. It will most likely NOT include the final measure.
+# EX:
+# [[BPM1, NumMeasure1], [BPM2, NumMeasures2]]
+def getMeasures(file_path, beats_per_measure, confidence_threshold):
+    beat_arr = analyze_beats.get_beat_locations_from_wav_file(file_path)
+    measure_arr = []
+    measure_arr.append(0)
+    num_measures = 0
+    for i in range(0, len(beat_arr)):
+        if ((i + 1) % beats_per_measure == 0):
+            num_measures += 1
+            measure_arr.append(beat_arr[i])
+    # NOTE at this point there is a chunk of music after the last location in measure_arr that
+    # we also need to analyze but that is not a full measure
+    index = 0
+    chunk_arr = []
+    num_chunks = 0
+    while (index < (len(measure_arr) - 1)):
+        chunk_length = 1
+        chunk_BPM = analyze_beats.get_bpm_from_wav_file(file_path, confidence_threshold, measure_arr[index], measure_arr[index + chunk_length])
+        if (index + chunk_length == len(measure_arr) - 1):
+            # This goes to the end of our data. Use this regardless of what the BPM returns
+            chunk_BPM = analyze_beats.get_bpm_from_wav_file(file_path, 0, measure_arr[index], measure_arr[index + chunk_length])
+            chunk_arr.append([chunk_BPM, chunk_length])
+            num_chunks += 1
+            break
+        while (chunk_BPM == 0 and index + chunk_length < (len(measure_arr) - 1)):
+            chunk_length += 1
+            chunk_BPM = analyze_beats.get_bpm_from_wav_file(file_path, confidence_threshold, measure_arr[index], measure_arr[index + chunk_length])
+        # Either the chunk returns a BPM or it goes until the end of our data
+        if (chunk_BPM == 0):
+            chunk_BPM = analyze_beats.get_bpm_from_wav_file(file_path, 0, measure_arr[index], measure_arr[index + chunk_length])
+        chunk_arr.append([chunk_BPM, chunk_length])
+        num_chunks += 1
+        index = index + chunk_length
+    return chunk_arr
+
+
 # Method to determine where the player slowed/sped up and return a string describing this
 # Accepts an array of integers each representing the tempo in a given measure and an integer representing the target tempo
 # Also accepts an integer representing the allowable margin of error
@@ -9,8 +52,8 @@ import numpy as np
 # Returns a string describing the patterns of the musician
 
 def getAnalysis(tempoArr, targetTempo, marginOfError):
-    # Create a list of lists. Each sublist will contain a string denoting 'fast' 'slow' or 'steady', 
-    # an integer that denotes the duration of this action, 
+    # Create a list of lists. Each sublist will contain a string denoting 'fast' 'slow' or 'steady',
+    # an integer that denotes the duration of this action,
     # and an integer that denotes the measure number of the last measure of this behavior
     behaviorList = []
     # Loop through the array of tempos
@@ -69,7 +112,7 @@ def getAnalysis(tempoArr, targetTempo, marginOfError):
                 steadyDuration = 0
                 slowDuration = 0
                 fastDuration = 1
-            elif (tempoArr[measure] < (targetTemp - marginOfError)):
+            elif (tempoArr[measure] < (targetTempo - marginOfError)):
                 # This measure is slow
                 slowDuration += 1
             else:
@@ -221,7 +264,7 @@ def speedRange(tempoArr, targetTempo, marginOfError, sigSpeedRange):
                     rangeList[counter] = Ranges("Fast",fastStart, measure - 1)
                     counter +=1
 
-            elif (tempoArr[measure] < (targetTemp - marginOfError)):
+            elif (tempoArr[measure] < (targetTempo - marginOfError)):
                 # This measure is slow
                 slowDuration += 1
                 numOfSlow += 1
@@ -242,7 +285,7 @@ def speedRange(tempoArr, targetTempo, marginOfError, sigSpeedRange):
 # beatsPerMeasure is the number of beats in a measure
 # tempoEstimate is the tempo the player is aiming to play at.
 # Returns an array of integers that represents the tempo of each measure.
-import bpmHistogram
+#import bpmHistogram
 def getTempos(audioFile, beatsPerMeasure, tempoEstimate):
     # TODO define this method as pseudocode
     pass
