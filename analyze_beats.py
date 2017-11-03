@@ -3,6 +3,7 @@ import essentia.standard
 import essentia.streaming
 import wave
 import contextlib
+from collections import OrderedDict
 
 def get_beat_locations_from_wav_file(file_path):
     """
@@ -72,19 +73,19 @@ def get_bpm_for_constant_fractions_of_wav_file(file_path, confidence_threshold, 
         raise ValueError('num_divisions must be greater than 0')
 
     length_sec = get_length_of_wav_file_seconds(file_path)
-    print(length_sec)
 
-    bpm_list = []
+    bpm_chunks_dict = OrderedDict()
 
     for i in range(0, num_divisions):
         start_audio = length_sec * (i / float(num_divisions))
-        print("Start audio: " + str(start_audio))
         end_audio = length_sec * ((i + 1) / float(num_divisions))
-        print("End audio: " + str(end_audio))
-        current_bpm = get_bpm_from_wav_file(file_path, confidence_threshold, start_audio, end_audio)
-        bpm_list.append(current_bpm)
+        time_range_tuple = (start_audio, end_audio)
 
-    return bpm_list
+        #In the output dictionary, values are bpms and keys are their associated time ranges
+        current_bpm = get_bpm_from_wav_file(file_path, confidence_threshold, start_audio, end_audio)
+        bpm_chunks_dict[time_range_tuple] = current_bpm
+
+    return bpm_chunks_dict
 
 
 
