@@ -32,6 +32,8 @@ def get_bpm_from_wav_file(file_path, confidence_threshold, start_time=None, end_
 
     @param file_path: Path to .wav file
     @param confidence_threshold: Float between 0.0 and 1.0, inclusive, specifying the confidence_threshold necessary to return nonzero estimate for bpm estimation
+    @param start_time: starting time in seconds of segment to analyze bpm
+    @param end_time: ending time in seconds of segment to analyze bpm
     @return: estimated bpm. If confidence for the bpm calculation is below the confidence_threshold, returns 0.0
     """
 
@@ -86,6 +88,31 @@ def get_bpm_for_constant_fractions_of_wav_file(file_path, confidence_threshold, 
         bpm_chunks_dict[time_range_tuple] = current_bpm
 
     return bpm_chunks_dict
+
+def get_bpm_from_audio_object(audio, confidence_threshold, start_time, end_time, total_audio_length_sec):
+    """
+    Given path to a .wav file, returns an estimate of the bpm.
+
+    @param audio: audio object that was already loaded from a wav file
+    @param confidence_threshold: Float between 0.0 and 1.0, inclusive, specifying the confidence_threshold necessary to return nonzero estimate for bpm estimation
+    @param start_time: starting time in seconds of segment to analyze bpm
+    @param end_time: ending time in seconds of segment to analyze bpm
+    @param total_audio_length_sec: length of audio file in seconds
+    @return: estimated bpm. If confidence for the bpm calculation is below the confidence_threshold, returns 0.0
+    """
+
+    #Make sure confidence_threshold is valid
+    if confidence_threshold < 0.0 or confidence_threshold > 1.0:
+        raise ValueError('Confidence threshold must be between 0.0 and 1.0 inclusive')
+
+    total_frames = len(audio)
+    start_frame = int(round((start_time / float(total_audio_length_sec)) * total_frames))
+    end_frame = int(round((end_time / float(total_audio_length_sec)) * total_frames))
+
+    #If the confidence is below the threshold, the estimated bpm will be 0.0.
+    loopBpmEstimator = essentia.standard.LoopBpmEstimator(confidenceThreshold=confidence_threshold)
+    bpm = loopBpmEstimator(audio[start_frame : end_frame])
+    return bpm
 
 
 
