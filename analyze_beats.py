@@ -89,9 +89,26 @@ def get_bpm_for_constant_fractions_of_wav_file(file_path, confidence_threshold, 
 
     return bpm_chunks_dict
 
-def get_bpm_from_audio_object(audio, confidence_threshold, start_time, end_time, total_audio_length_sec):
+def get_audio_from_wav_path(file_path):
     """
-    Given path to a .wav file, returns an estimate of the bpm.
+    Given path to a .wav file, returns the loaded audio array
+
+    @param file_path: Path to .wav file
+    @return: audio object
+    """
+    try:
+        #instantiate the audio loader
+        loader = essentia.standard.EasyLoader(filename=str(file_path))
+        #actually perform the loading
+        audio = loader()
+        return audio
+    except:
+        raise ValueError('Could not load .wav file. Make sure path to file is correct.' + '\nFile path: ' + str(file_path))
+
+
+def get_bpm_from_audio_array(audio, confidence_threshold, start_time, end_time, total_audio_length_sec):
+    """
+    Given a pre-loaded audio object, find bpm based on given parameters.
 
     @param audio: audio object that was already loaded from a wav file
     @param confidence_threshold: Float between 0.0 and 1.0, inclusive, specifying the confidence_threshold necessary to return nonzero estimate for bpm estimation
