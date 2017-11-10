@@ -6,3 +6,9 @@
 h1 {
 	color: blue;
 }
+
+body {
+	background-image: url(https://previews.123rf.com/images/burand/burand1101/burand110100017/8539584-music-grunge-as-background-Stock-Photo-piano.jpg);
+	background-repeat:no-repeat;
+	background-size: 100%;
+}
