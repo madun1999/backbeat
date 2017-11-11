@@ -23,7 +23,7 @@ Download from https://github.com/MTG/essentia/releases
 Follow their python tutorial http://essentia.upf.edu/documentation/essentia_python_tutorial.html to get started
 
 ## More information
-Logic and todo
-https://docs.google.com/document/d/1qVCIMUSHB5gyCSdmweo8a-1h1hpbpbgBpWxSLznqk4E
-Midterm slides
-https://docs.google.com/presentation/d/1IgLYw3F50nrbtY1AKm2jXoJm1HuVfAaWtNDKcwvzdNk
+Logic and todo  
+https://docs.google.com/document/d/1qVCIMUSHB5gyCSdmweo8a-1h1hpbpbgBpWxSLznqk4E  
+Midterm slides  
+https://docs.google.com/presentation/d/1IgLYw3F50nrbtY1AKm2jXoJm1HuVfAaWtNDKcwvzdNk  
