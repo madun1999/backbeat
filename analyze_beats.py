@@ -32,6 +32,8 @@ def get_bpm_from_wav_file(file_path, confidence_threshold, start_time=None, end_
 
     @param file_path: Path to .wav file
     @param confidence_threshold: Float between 0.0 and 1.0, inclusive, specifying the confidence_threshold necessary to return nonzero estimate for bpm estimation
+    @param start_time: starting time in seconds of segment to analyze bpm
+    @param end_time: ending time in seconds of segment to analyze bpm
     @return: estimated bpm. If confidence for the bpm calculation is below the confidence_threshold, returns 0.0
     """
 
@@ -87,5 +89,45 @@ def get_bpm_for_constant_fractions_of_wav_file(file_path, confidence_threshold, 
 
     return bpm_chunks_dict
 
+def get_audio_from_wav_path(file_path):
+    """
+    Given path to a .wav file, returns the loaded audio array
 
+    @param file_path: Path to .wav file
+    @return: audio object
+    """
+    try:
+        #instantiate the audio loader
+        loader = essentia.standard.EasyLoader(filename=str(file_path))
+        #actually perform the loading
+        audio = loader()
+        return audio
+    except:
+        raise ValueError('Could not load .wav file. Make sure path to file is correct.' + '\nFile path: ' + str(file_path))
+
+
+def get_bpm_from_audio_array(audio, confidence_threshold, start_time, end_time, total_audio_length_sec):
+    """
+    Given a pre-loaded audio object, find bpm based on given parameters.
+
+    @param audio: audio object that was already loaded from a wav file
+    @param confidence_threshold: Float between 0.0 and 1.0, inclusive, specifying the confidence_threshold necessary to return nonzero estimate for bpm estimation
+    @param start_time: starting time in seconds of segment to analyze bpm
+    @param end_time: ending time in seconds of segment to analyze bpm
+    @param total_audio_length_sec: length of audio file in seconds
+    @return: estimated bpm. If confidence for the bpm calculation is below the confidence_threshold, returns 0.0
+    """
+
+    #Make sure confidence_threshold is valid
+    if confidence_threshold < 0.0 or confidence_threshold > 1.0:
+        raise ValueError('Confidence threshold must be between 0.0 and 1.0 inclusive')
+
+    total_frames = len(audio)
+    start_frame = int(round((start_time / float(total_audio_length_sec)) * total_frames))
+    end_frame = int(round((end_time / float(total_audio_length_sec)) * total_frames))
+
+    #If the confidence is below the threshold, the estimated bpm will be 0.0.
+    loopBpmEstimator = essentia.standard.LoopBpmEstimator(confidenceThreshold=confidence_threshold)
+    bpm = loopBpmEstimator(audio[start_frame : end_frame])
+    return bpm
 
