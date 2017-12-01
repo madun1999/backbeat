@@ -10,6 +10,8 @@ import os
 # [[BPM1, NumMeasure1], [BPM2, NumMeasures2]]
 def getMeasures(file_path, beats_per_measure, confidence_threshold):
     beat_arr = analyze_beats.get_beat_locations_from_wav_file(file_path)
+    total_length_sec = analyze_beats.get_length_of_wav_file_seconds(file_path)
+    audio = analyze_beats.get_audio_from_wav_path(file_path)
     measure_arr = []
     measure_arr.append(0)
     num_measures = 0
@@ -24,19 +26,21 @@ def getMeasures(file_path, beats_per_measure, confidence_threshold):
     num_chunks = 0
     while (index < (len(measure_arr) - 1)):
         chunk_length = 1
-        chunk_BPM = analyze_beats.get_bpm_from_wav_file(file_path, confidence_threshold, measure_arr[index], measure_arr[index + chunk_length])
+        chunk_BPM = analyze_beats.get_bpm_from_audio_array(
+                audio, confidence_threshold, measure_arr[index], measure_arr[index + chunk_length], total_length_sec)
+
         if (index + chunk_length == len(measure_arr) - 1):
             # This goes to the end of our data. Use this regardless of what the BPM returns
-            chunk_BPM = analyze_beats.get_bpm_from_wav_file(file_path, 0, measure_arr[index], measure_arr[index + chunk_length])
+            chunk_BPM = analyze_beats.get_bpm_from_audio_array(audio, 0, measure_arr[index], measure_arr[index + chunk_length], total_length_sec)
             chunk_arr.append([chunk_BPM, chunk_length])
             num_chunks += 1
             break
         while (chunk_BPM == 0 and index + chunk_length < (len(measure_arr) - 1)):
             chunk_length += 1
-            chunk_BPM = analyze_beats.get_bpm_from_wav_file(file_path, confidence_threshold, measure_arr[index], measure_arr[index + chunk_length])
+            chunk_BPM = analyze_beats.get_bpm_from_audio_array(audio, confidence_threshold, measure_arr[index], measure_arr[index + chunk_length], total_length_sec)
         # Either the chunk returns a BPM or it goes until the end of our data
         if (chunk_BPM == 0):
-            chunk_BPM = analyze_beats.get_bpm_from_wav_file(file_path, 0, measure_arr[index], measure_arr[index + chunk_length])
+            chunk_BPM = analyze_beats.get_bpm_from_audio_array(audio, 0, measure_arr[index], measure_arr[index + chunk_length], total_length_sec)
         chunk_arr.append([chunk_BPM, chunk_length])
         num_chunks += 1
         index = index + chunk_length
